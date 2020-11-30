@@ -17,6 +17,7 @@ from keras.callbacks import EarlyStopping
 
 """# Requirements"""
 
+# returns lists ol(kridant), w1l(dhatu), w2l(pratya)
 def get_data(path):
   with open(path) as f:
     lines=f.read().splitlines()
@@ -34,19 +35,16 @@ def get_data(path):
 
   return w1l,w2l,ol
 
-def get_texts(file_path,test_split=0.2,random_state=1):
+def get_texts(file_path,test_split=0.2,random_state=1,take_last_two=False):
   input_texts = []
   target_texts = []
-  #w1l, w2l, ol = pdp.get_xy_data("Data/kridantaList.txt")
-  # Reading directly from converted file
-  #Satf~ .... total: 324 correct: 179 ....accuracy: 55.24691358024691
-  #SAnac .... total: 200 correct: 116 ....accuracy: 57.99999999999999
   w1l,w2l,ol=get_data(file_path)
 
   print("Sandhi dataset created")
   ct=0
   for i in range(len(w1l)):
-    if(w2l[i]=="Satf~" or w2l[i]=="SAnac"):
+    #this condition avoids all the Satf~ and SAnac pratya
+    if(take_last_two==False and w2l[i]=="Satf~" or w2l[i]=="SAnac"):
       ct+=1
       continue
     input_text = w1l[i] + '+' + w2l[i]
@@ -55,7 +53,7 @@ def get_texts(file_path,test_split=0.2,random_state=1):
     target_text = '&' + target_text + '$'
     input_texts.append(input_text)
     target_texts.append(target_text)
-  print(ct)
+  print("Total number of last two pratyas:",ct)
   if(test_split!=0):
     X_train, X_test, Y_train, Y_test = train_test_split(input_texts, target_texts, test_size=test_split, random_state=random_state)
     return X_train,X_test,Y_train,Y_test
@@ -128,13 +126,15 @@ def get_trained_model(architecture,X_train,Y_train,X_test=None,Y_test=None,laten
   #save the best model and last model before returning
   return model
 
-def use_wandb(project_name,run_name,batch_size,epochs,validation_split,latent_dim):
+# This function is just for logging results.
+"""def use_wandb(project_name,run_name,batch_size,epochs,validation_split,latent_dim):
     wandb.init(project=project_name,name=run_name)
     config=wandb.config
     config.epochs=epochs
     config.batch_size=batch_size
     config.validation_split=validation_split
     config.latent_dim=latent_dim
+"""  
 
 def train(model,encoder_input_data,decoder_input_data,decoder_target_data,batch_size,epochs,validation_split,verbose,use_wandb=False,re=False):
   if(re==False):
@@ -280,7 +280,7 @@ class Translator:
 
     return decoded_sentence
 
-# use maximum seq length for input before using i.e 18 for taddhita and 17 for kridant
+# use maximum seq length for input before using i.e 18 for taddhita and 17 for kridant in our dataset. You can explicilty check the length for your dataset. It is however not needed for a model that does not use attention.
 class attention(Layer):
     def __init__(self,**kwargs):
         super(attention,self).__init__(**kwargs)
@@ -389,10 +389,6 @@ def save_model(filename,model_obj):
     
 def restore_model(filename):                                                
   return pickle.load(open(filename,'rb'))
-
-#translator.model.save("a.h")
-
-#translator.model=load_model("a.h")
 
 """# Training"""
 
