@@ -392,14 +392,14 @@ def restore_model(filename):
 
 """# Training"""
 
-X_train, X_test, Y_train, Y_test=get_texts("Kosh/Taddhita.txt",random_state=1)
+X_train, X_test, Y_train, Y_test=get_texts("Kosh_data/Taddhita.txt",random_state=1)
 
 # can also use get_model instead of get_attention model to run the model without attention
 translator=get_trained_model(get_model_attention,X_train,Y_train,X_test,Y_test,epochs=70,validation_split=0.1,batch_size=32,latent_dim=64,use_wandb=False)
 
-normal_testing(X_test,Y_test,model=translator,verbose=0,use_wandb=False)
+normal_testing(X_test,Y_test,model=translator,verbose=0,use_wandb=False) #gives test accuracy
 
-normal_testing(X_train,Y_train,model=translator,verbose=0,use_wandb=False,log_as="train_passed")
+normal_testing(X_train,Y_train,model=translator,verbose=0,use_wandb=False,log_as="train_passed")  # gives train accuracy
 
 
 
