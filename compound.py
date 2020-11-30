@@ -392,7 +392,7 @@ def restore_model(filename):
 
 """# Training"""
 
-X_train, X_test, Y_train, Y_test=get_texts("/content/black_and_yellow_encoded.txt",random_state=1)
+X_train, X_test, Y_train, Y_test=get_texts("Kosh/Taddhita.txt",random_state=1)
 
 # can also use get_model instead of get_attention model to run the model without attention
 translator=get_trained_model(get_model_attention,X_train,Y_train,X_test,Y_test,epochs=70,validation_split=0.1,batch_size=32,latent_dim=64,use_wandb=False)
